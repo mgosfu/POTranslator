@@ -5,11 +5,33 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import com.microsoft.cognitiveservices.speechrecognition.ISpeechRecognitionServerEvents;
+import com.microsoft.cognitiveservices.speechrecognition.MicrophoneRecognitionClient;
+import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionMode;
+
+public class MainActivity extends AppCompatActivity
+implements ISpeechRecognitionServerEvents {
+
+    public static final String LOG = "POTranslator";
+    private MicrophoneRecognitionClient mMicClient = null;
+    private SpeechRecognitionMode mSpeechMode = SpeechRecognitionMode.ShortPhrase;
+
+    private String mLanguageCode = Constants.LANGUAGE_CODES[0];
+    private String mKey = Constants.PRIMARY_SUBSCRIPTION_KEY;
+
+    private TextView mResultText;
+    private FloatingActionButton mFab;
+
+    private int onlineIcon;
+    private int busyIcon;
+
+    private boolean mHasStartedRecording = false;
+    private boolean mHasOptionChanged = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
