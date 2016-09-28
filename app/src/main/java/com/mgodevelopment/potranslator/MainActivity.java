@@ -86,6 +86,20 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+
+        super.onSaveInstanceState(outState);
+        outState.putString("mResultText", mResultText.getText().toString());
+
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mResultText.setText(savedInstanceState.getString("mResultText"));
+    }
+
     private boolean hasInternetConnection() {
 
         ConnectivityManager connectivityManager = ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE));
@@ -119,8 +133,8 @@ public class MainActivity extends AppCompatActivity
         final Spinner spinner = (Spinner) findViewById(R.id.language_spinner);
         spinner.setSaveEnabled(true);
 
-        // TODO spinner.setSelection(SharedPreferencesUtils.getBaseLanguageIndex(this));
-        // TODO mLanguageCode = Constants.LANGUAGE_CODES[SharedPreferenceUtils.getBaseLanguageIndex(this));
+        spinner.setSelection(SharedPreferencesUtils.getBaseLanguageIndex(this));
+        mLanguageCode = Constants.LANGUAGE_CODES[SharedPreferencesUtils.getBaseLanguageIndex(this)];
 
         spinner.post(new Runnable() {
             @Override
@@ -132,6 +146,7 @@ public class MainActivity extends AppCompatActivity
                         Log.d(TAG, "in Language Spinner onItemSelected");
                         mLanguageCode = Constants.LANGUAGE_CODES[position];
                         mHasOptionChanged = true;
+                        SharedPreferencesUtils.updateBaseLanguageIndex(MainActivity.this, position);
 
                     }
 
@@ -150,9 +165,9 @@ public class MainActivity extends AppCompatActivity
         final Spinner spinner = (Spinner) findViewById(R.id.speech_mode_spinner);
         spinner.setSaveEnabled(true);
 
-        // TODO int pref = SharedPreferencesUtils.getSpeechModeIndex(this);
-        // TODO spinner.setSelection(pref);
-        // TODO mSpeechMode = pref == 0 ? SpeechRecognitionMode.ShortPhrase : SpeechRecognitionMode.LongDictation
+        int pref = SharedPreferencesUtils.getSpeechModeIndex(this);
+        spinner.setSelection(pref);
+        mSpeechMode = pref == 0 ? SpeechRecognitionMode.ShortPhrase : SpeechRecognitionMode.LongDictation;
 
         spinner.post(new Runnable() {
             @Override
@@ -164,6 +179,7 @@ public class MainActivity extends AppCompatActivity
                         Log.d(TAG, "in Speech Mode Spinner onItemSelected");
                         mSpeechMode = position == 0 ? SpeechRecognitionMode.ShortPhrase : SpeechRecognitionMode.LongDictation;
                         mHasOptionChanged = true;
+                        SharedPreferencesUtils.updateSpeechModeIndex(MainActivity.this, position);
 
                     }
 
