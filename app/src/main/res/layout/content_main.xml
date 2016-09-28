@@ -14,11 +14,10 @@
     tools:context="com.mgodevelopment.potranslator.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/resultText"
@@ -28,6 +27,41 @@
             android:textColor="@android:color/black"
             android:textSize="16sp"/>
 
-    </ScrollView>
+        <RelativeLayout
+            android:id="@+id/suggestionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/textSuggestions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:background="@color/colorPrimary"
+                android:text="@string/suggestions"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <ListView
+                android:id="@+id/resultList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/textSuggestions"
+                android:layout_marginTop="4dp"
+                android:choiceMode="singleChoice"
+                android:divider="@android:color/darker_gray"
+                android:dividerHeight="1dp"
+                android:listSelector="@color/colorPrimary">
+
+            </ListView>
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
 </RelativeLayout>

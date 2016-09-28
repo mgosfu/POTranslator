@@ -13,7 +13,7 @@
     <string name="translate_button_text">Translate\n</string>
     <string name="dialog_title">Translate To:\n</string>
     <string name="check_connection">Please check your internet connection\n</string>
-    <string name="internet_error_text">Cannot connect to server\nError has occured!\n</string>
+    <string name="internet_error_text">Cannot connect to server\nError has occurred!\n</string>
     <string name="recording_start">RECORDING STARTED\n</string>
     <string name="recording_end">RECORDING ENDED\n</string>
     <string name="translation_start">\nTRANSLATION STARTED\n</string>

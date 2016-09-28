@@ -26,8 +26,8 @@ public class Constants {
     public static final String BASE_LANGUAGE_INDEX = "BaseLanguageIndex";
     public static final String CONVERT_LANGUAGE_INDEX = "ConvertLanguageIndex";
 
-    public static final String CLIENT_ID_VALUE = "TBA";
-    public static final String CLIENT_SECRET_VALUE = "TBA";
+    public static final String CLIENT_ID_VALUE = "com_mgodevelopment_speechtotext";
+    public static final String CLIENT_SECRET_VALUE = "WEVCvnqBJeX4astpyIel816Qfl4k6vvCfB//Gbo4PzI=";
 
     public static final Language[] LANGUAGES = {
             Language.ENGLISH,
