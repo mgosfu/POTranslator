@@ -1,7 +1,9 @@
-package com.mgodevelopment.potranslator;
+package com.mgodevelopment.potranslator.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.mgodevelopment.potranslator.Constants;
 
 /**
  * Created by Martin on 9/27/2016.
