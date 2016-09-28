@@ -20,8 +20,6 @@ import com.microsoft.cognitiveservices.speechrecognition.RecognitionStatus;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionMode;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionServiceFactory;
 
-import static com.mgodevelopment.potranslator.R.id.fab;
-
 public class MainActivity extends AppCompatActivity
         implements ISpeechRecognitionServerEvents {
 
@@ -57,7 +55,7 @@ public class MainActivity extends AppCompatActivity
         onlineIcon = getResources().getIdentifier("@android:drawable/presence_audio_online", null, null);
         busyIcon = getResources().getIdentifier("@android:drawable/ic_voice_search", null, null);
 
-        FloatingActionButton mFab = (FloatingActionButton) findViewById(fab);
+        mFab = (FloatingActionButton) findViewById(R.id.mFab);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -225,8 +223,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onIntentReceived(String response) {
-        // We're not using speech recognition with intent but
-        // we must implement all the interface methods.
+        // We're not using speech recognition with intent (of the speaker),
+        // but we must implement all the interface methods.
     }
 
     @Override
@@ -259,6 +257,7 @@ public class MainActivity extends AppCompatActivity
             }
             mFab.setImageResource(busyIcon);
         }
+
         mResultText.append(isRecording ? "RECORDING STARTED\n" : "RECORDING ENDED\n");
 
     }
