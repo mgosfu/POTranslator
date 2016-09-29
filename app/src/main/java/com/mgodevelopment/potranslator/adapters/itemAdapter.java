@@ -34,13 +34,13 @@ public class ItemAdapter extends BaseAdapter {
     }
 
     @Override
-    public long getItemId(int position) {
-        return 0;
+    public Object getItem(int position) {
+        return items.get(position);
     }
 
     @Override
-    public Object getItem(int position) {
-        return null;
+    public long getItemId(int position) {
+        return 0;
     }
 
     @Override
