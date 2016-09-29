@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import com.memetix.mst.language.Language;
 import com.memetix.mst.translate.Translate;
 import com.mgodevelopment.potranslator.adapters.ItemAdapter;
+import com.mgodevelopment.potranslator.models.Voices;
 import com.mgodevelopment.potranslator.utils.SharedPreferencesUtils;
 import com.microsoft.cognitiveservices.speechrecognition.ISpeechRecognitionServerEvents;
 import com.microsoft.cognitiveservices.speechrecognition.MicrophoneRecognitionClient;
@@ -26,6 +28,8 @@ import com.microsoft.cognitiveservices.speechrecognition.RecognitionResult;
 import com.microsoft.cognitiveservices.speechrecognition.RecognitionStatus;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionMode;
 import com.microsoft.cognitiveservices.speechrecognition.SpeechRecognitionServiceFactory;
+import com.microsoft.speech.tts.Synthesizer;
+import com.microsoft.speech.tts.Voice;
 
 public class MainActivity extends AppCompatActivity
         implements ISpeechRecognitionServerEvents {
@@ -142,6 +146,11 @@ public class MainActivity extends AppCompatActivity
 
         // discard previous items
         mItemAdapter.clear();
+        // and hide the speaker button
+        ImageButton speakButton = (ImageButton) findViewById(R.id.speak_button);
+        if (speakButton != null) {
+            speakButton.setVisibility(View.GONE);
+        }
 
     }
 
@@ -405,6 +414,34 @@ public class MainActivity extends AppCompatActivity
             super.onPostExecute(aVoid);
             mResultText.setText(getString(R.string.translation_header));
             mResultText.append(translatedText);
+
+            // set up the click listener for the Speak button
+            ImageButton speakButton = (ImageButton) findViewById(R.id.speak_button);
+            if (speakButton != null) {
+
+                speakButton.setVisibility(View.VISIBLE);
+                speakButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        // Get the language code that the translation is in
+                        String speechLanguage = Constants.LANGUAGE_CODES[SharedPreferencesUtils.getConvertLanguageIndex(MainActivity.this)];
+                        Log.d(TAG, "Speech language is: " + speechLanguage);
+                        //Synthesizer synthesizer = new Synthesizer(getString(R.string.app_name), Constants.PRIMARY_SUBSCRIPTION_KEY); // deprecated ?
+                        Synthesizer synthesizer = new Synthesizer(mKey);
+                        Voice voice = Voices.getVoice(speechLanguage, 0);
+
+                        if (voice != null) {
+                            Log.d(TAG, voice.voiceName);
+                            synthesizer.SetVoice(voice, voice);
+                            Log.d(TAG, "Speaking: " + translatedText);
+                            synthesizer.SpeakToAudio(translatedText);
+                        }
+
+                    }
+                });
+
+            }
 
         }
 
