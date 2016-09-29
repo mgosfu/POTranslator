@@ -9,10 +9,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.memetix.mst.language.Language;
+import com.mgodevelopment.potranslator.adapters.ItemAdapter;
 import com.mgodevelopment.potranslator.utils.SharedPreferencesUtils;
 import com.microsoft.cognitiveservices.speechrecognition.ISpeechRecognitionServerEvents;
 import com.microsoft.cognitiveservices.speechrecognition.MicrophoneRecognitionClient;
@@ -29,10 +32,14 @@ public class MainActivity extends AppCompatActivity
     private SpeechRecognitionMode mSpeechMode = SpeechRecognitionMode.ShortPhrase;
 
     private String mLanguageCode = Constants.LANGUAGE_CODES[0];
+    private Language mLanguageTranslation = Constants.LANGUAGES[0];
     private String mKey = Constants.PRIMARY_SUBSCRIPTION_KEY;
 
     private TextView mResultText;
     private FloatingActionButton mFab;
+
+    private ItemAdapter mItemAdapter = new ItemAdapter(this);
+    private View mSuggestionLayout;
 
     private int onlineIcon;
     private int busyIcon;
@@ -53,6 +60,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         mResultText = (TextView) findViewById(R.id.resultText);
+        mSuggestionLayout = findViewById(R.id.suggestionLayout);
+
         onlineIcon = getResources().getIdentifier("@android:drawable/presence_audio_online", null, null);
         busyIcon = getResources().getIdentifier("@android:drawable/ic_voice_search", null, null);
 
@@ -62,6 +71,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 if (hasInternetConnection()) {
                     mResultText.setText("");
+                    mSuggestionLayout.setVisibility(View.GONE);
                     initRecording();
                     if (mMicClient != null) {
                         if (mSpeechMode.equals(SpeechRecognitionMode.ShortPhrase)) {
@@ -77,7 +87,7 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                 } else {
-                    Toast.makeText(MainActivity.this, "Please check your Internet connection", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, getString(R.string.check_connection), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -117,15 +127,18 @@ public class MainActivity extends AppCompatActivity
             Log.d(TAG, "Language is " + mLanguageCode + "\nSpeech mode is " + mSpeechMode);
 
             if (mKey.equals(Constants.PRIMARY_SUBSCRIPTION_KEY)) {
-                mResultText.append("Connecting with PRIMARY KEY \n");
+                mResultText.append(getString(R.string.primary_connect));
             } else {
-                mResultText.append("Connecting with SECONDARY KEY \n");
+                mResultText.append(getString(R.string.secondary_connect));
             }
 
             mMicClient = SpeechRecognitionServiceFactory.createMicrophoneClient(this, mSpeechMode, mLanguageCode, this, mKey);
             mHasOptionChanged = false;
 
         }
+
+        // discard previous items
+        mItemAdapter.clear();
 
     }
 
@@ -204,6 +217,7 @@ public class MainActivity extends AppCompatActivity
     public void onFinalResponseReceived(RecognitionResult recognitionResult) {
 
         // explanation of results at https://msdn.microsoft.com/en-us/library/mt613453.aspx
+        mResultText.setText("");
         boolean isFinalDictationMessage = (
                 mSpeechMode == SpeechRecognitionMode.LongDictation
                         && (
@@ -222,19 +236,31 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-        StringBuilder sb = new StringBuilder();
-        if (isFinalDictationMessage) {
-            sb.append("Final Dictation Message");
+        if (recognitionResult.Results.length > 0) {
+
+            ListView listView = (ListView) findViewById(R.id.resultList);
+            listView.setAdapter(mItemAdapter);
+            mSuggestionLayout.setVisibility(View.VISIBLE);
+
+            for (int i = 0; i < recognitionResult.Results.length; i++) {
+                mItemAdapter.addItem(recognitionResult.Results[i].DisplayText);
+            }
+
         }
 
-        if (recognitionResult.Results.length > 0) {
-            sb.append("Text Suggestions\n");
-            for (int i = 0; i < recognitionResult.Results.length; i++) {
-                sb.append((i + 1) + " " + recognitionResult.Results[i].DisplayText + "\n");
-            }
-            sb.append("\n" + mResultText.getText().toString());
-            mResultText.setText(sb.toString());
-        }
+//        StringBuilder sb = new StringBuilder();
+//        if (isFinalDictationMessage) {
+//            sb.append("Final Dictation Message");
+//        }
+//
+//        if (recognitionResult.Results.length > 0) {
+//            sb.append("Text Suggestions\n");
+//            for (int i = 0; i < recognitionResult.Results.length; i++) {
+//                sb.append((i + 1) + " " + recognitionResult.Results[i].DisplayText + "\n");
+//            }
+//            sb.append("\n" + mResultText.getText().toString());
+//            mResultText.setText(sb.toString());
+//        }
 
     }
 
@@ -249,7 +275,7 @@ public class MainActivity extends AppCompatActivity
 
         mFab.setEnabled(true);
         mFab.setImageResource(onlineIcon);
-        Toast.makeText(this, "Cannot connect to server!\nError has occured!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.internet_error_text), Toast.LENGTH_SHORT).show();
         mResultText.append("Error " + errorCode + ": " + response + "\n");
         mMicClient = null; // Force an initialization when recording next time
         mKey = mKey == Constants.PRIMARY_SUBSCRIPTION_KEY ? Constants.SECONDARY_SUBSCRIPTION_KEY : Constants.PRIMARY_SUBSCRIPTION_KEY;
@@ -275,32 +301,8 @@ public class MainActivity extends AppCompatActivity
             mFab.setImageResource(busyIcon);
         }
 
-        mResultText.append(isRecording ? "RECORDING STARTED\n" : "RECORDING ENDED\n");
+        mResultText.append(isRecording ? getString(R.string.recording_start) : getString(R.string.recording_end));
 
     }
-
-
-
-    //    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 
 }
