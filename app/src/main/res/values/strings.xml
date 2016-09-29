@@ -18,6 +18,7 @@
     <string name="recording_end">RECORDING ENDED\n</string>
     <string name="translation_start">\nTRANSLATION STARTED\n</string>
     <string name="translation_header">Translation:\n\n</string>
+    <string name="initial_result_text">Tap the microphone to start recording</string>
 
     <string-array name="speech_mode">
         <item>Short Phrase</item>
