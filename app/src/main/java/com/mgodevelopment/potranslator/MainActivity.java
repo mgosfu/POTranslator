@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
                     final Dialog dialog = new Dialog(MainActivity.this);
                     dialog.setContentView(R.layout.dialog_content);
@@ -261,6 +261,43 @@ public class MainActivity extends AppCompatActivity
                     translationAdapter.setItems(getResources().getStringArray(R.array.languages));
                     translationList.setAdapter(translationAdapter);
                     translationAdapter.setSelected(SharedPreferencesUtils.getConvertLanguageIndex(MainActivity.this));
+                    // Initialize the translation language to the stored preference
+                    mLanguageTranslation = Constants.LANGUAGES[SharedPreferencesUtils.getConvertLanguageIndex(MainActivity.this)];
+
+                    translationList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                            mLanguageTranslation = Constants.LANGUAGES[position];
+                            SharedPreferencesUtils.updateConvertLanguageIndex(MainActivity.this, position);
+                            translationAdapter.setSelected(position);
+
+                        }
+                    });
+
+                    dialog.findViewById(R.id.translate_button).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            dialog.dismiss();
+                            mResultText.setText("");
+                            new TranslationTask(Constants.LANGUAGES[SharedPreferencesUtils.getBaseLanguageIndex(MainActivity.this)],
+                                    mLanguageTranslation,
+                                    (String) mItemAdapter.getItem(position)).execute();
+
+                        }
+                    });
+
+                    dialog.findViewById(R.id.cancel_button).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    dialog.setCancelable(true);
+                    dialog.setTitle(getString(R.string.dialog_title));
+                    dialog.show();
 
                 }
             });
@@ -372,34 +409,5 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
