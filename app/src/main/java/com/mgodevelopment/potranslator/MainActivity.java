@@ -1,7 +1,9 @@
 package com.mgodevelopment.potranslator;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.memetix.mst.language.Language;
+import com.memetix.mst.translate.Translate;
 import com.mgodevelopment.potranslator.adapters.ItemAdapter;
 import com.mgodevelopment.potranslator.utils.SharedPreferencesUtils;
 import com.microsoft.cognitiveservices.speechrecognition.ISpeechRecognitionServerEvents;
@@ -246,6 +249,22 @@ public class MainActivity extends AppCompatActivity
                 mItemAdapter.addItem(recognitionResult.Results[i].DisplayText);
             }
 
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    final Dialog dialog = new Dialog(MainActivity.this);
+                    dialog.setContentView(R.layout.dialog_content);
+
+                    ListView translationList = (ListView) dialog.findViewById(R.id.translation_list);
+                    final ItemAdapter translationAdapter = new ItemAdapter(MainActivity.this);
+                    translationAdapter.setItems(getResources().getStringArray(R.array.languages));
+                    translationList.setAdapter(translationAdapter);
+                    translationAdapter.setSelected(SharedPreferencesUtils.getConvertLanguageIndex(MainActivity.this));
+
+                }
+            });
+
         }
 
 //        StringBuilder sb = new StringBuilder();
@@ -304,5 +323,83 @@ public class MainActivity extends AppCompatActivity
         mResultText.append(isRecording ? getString(R.string.recording_start) : getString(R.string.recording_end));
 
     }
+
+    private class TranslationTask extends AsyncTask<Void, Void, Void> {
+
+        private final Language baseLanguage;
+        private final Language convertLanguage;
+        private final String word;
+        private String translatedText = "";
+
+        public TranslationTask(Language baseLanguage, Language convertLanguage, String word) {
+            this.baseLanguage = baseLanguage;
+            this.convertLanguage = convertLanguage;
+            this.word = word;
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+            super.onPreExecute();
+            mResultText.append("Word Selected: " + word);
+            mResultText.append(getString(R.string.translation_start));
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            Translate.setClientId(Constants.CLIENT_ID_VALUE);
+            Translate.setClientSecret(Constants.CLIENT_SECRET_VALUE);
+
+            try {
+                translatedText = Translate.execute(word, baseLanguage, convertLanguage);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            super.onPostExecute(aVoid);
+            mResultText.setText(getString(R.string.translation_header));
+            mResultText.append(translatedText);
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
